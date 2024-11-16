@@ -4,9 +4,9 @@
 
 ## Introduction 
 
-**MEMESurreal, built with UniswapV4 hooks and CDP AgentKit, is an Agent-powered Meme Launchpad where users can enjoy customized LP profitability while autonomous agents can launch UniV4 pool.** 
+**_MEMESurreal_, built with UniswapV4 hooks and CDP AgentKit, is an Agent-powered Meme Launchpad where users can enjoy customized LP profitability while autonomous agents can launch UniV4 pool.** 
 
-Pitch: 
+Pitch Deck:
 https://docs.google.com/presentation/d/1ySrB0Ufig1rUKbu5o64p1uFz4ZHNv4AuqJtPWdd82sc/edit?usp=sharing
 
 ## Key Features
