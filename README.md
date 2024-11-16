@@ -1,3 +1,3 @@
 # MEMEsurreal
 
-![Logo](./logo.png)
+![Logo](./logo.jpg)
