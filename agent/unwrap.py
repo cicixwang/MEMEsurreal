@@ -16,6 +16,7 @@ from collections.abc import Callable
 
 from cdp import Wallet
 from pydantic import BaseModel, Field
+import eth_abi
 
 
 UNWRAP_TOKEN_PROMPT = """
@@ -24,10 +25,14 @@ This tool will unwrap an ERC7527 NFT back to the original ERC20 token using the 
 
 class UnwrapTokenInput(BaseModel):
      """Input argument schema for wrap token action."""
+     
+     token_id: str = Field(
+        ...,
+        description="The ID of the ERC7527 NFT to unwrap, e.g. `1`.",
+    )
 
 
-
-def unwrap_token(wallet: Wallet) -> str:
+def unwrap_token(wallet: Wallet, token_id: str) -> str:
     """Unwrap an ERC7527 NFT back to ERC20 token via contract invocation.
 
     Args:
@@ -38,10 +43,13 @@ def unwrap_token(wallet: Wallet) -> str:
         str: A message containing the unwrap transaction details.
     """
 
-    encoded_data = "0x00"
+    types = ["uint256", "string"]
+    values = [int(5000e18), ""]
+    encoded_data = eth_abi.encode(types, values)
 
-    unwrap_args = {"to": wallet.default_address.address_id, 
-                    "data": encoded_data}
+    unwrap_args = {"to": wallet.default_address.address_id,
+               "tokenId": token_id,
+               "data": encoded_data.hex()}
 
     abi = [
         {
@@ -657,18 +665,24 @@ def unwrap_token(wallet: Wallet) -> str:
         }
     ]
 
+    # Constants
+    TOKEN_ADDRESS = "0x548A7404C1089c2B0b0b8dfe25784446c7d30B22"
+    WRAP_CONTRACT = "0xA916DA17a6F73f02fcA97564517AC39b27eeaf7A"
+
     try:
         unwrap_invocation = wallet.invoke_contract(
-            contract_address="0xfAa8e5B0Ef93dF841B37807E13Fe77Ff54986Ac2",
+            contract_address=WRAP_CONTRACT,
             abi=abi,
             method="unwrap",
             args=unwrap_args,
-            amount=12,
-            asset_id="0x548A7404C1089c2B0b0b8dfe25784446c7d30B22"
         ).wait()
     except Exception as e:
         return f"Error unwrapping NFT: {e!s}"
 
-    return f"Unwrapped ERC7527 NFT (ID: {token_id}) back to ERC20 token on network {wallet.network_id}.\nTransaction hash: {unwrap_invocation.transaction.transaction_hash}\nTransaction link: {unwrap_invocation.transaction.transaction_link}"
+    return f"""
+    Unwrapped ERC7527 NFT (ID: {token_id}) back to ERC20 token on network {wallet.network_id}.
+    Transaction hash: {unwrap_invocation.transaction.transaction_hash}
+    Transaction link: {unwrap_invocation.transaction.transaction_link}
+    """
 
 
